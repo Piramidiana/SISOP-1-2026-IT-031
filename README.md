@@ -83,6 +83,13 @@ chmod +x kost_slebew.sh
 8. **Hapus Cron Job**
 ![soal3cron_hapus](assets/soal_3/soal3cron_hapus.png)
 
+## Kendala
+
+1. **User tidak punya akses sudo** — saat install pip dan gdown, harus switch ke root terlebih dahulu melalui PowerShell Windows dengan perintah `ubuntu2404 config --default-user root`
+2. **Error syntax di nano** — beberapa perintah AWK yang kompleks susah diketik manual di nano, terutama bagian soal c di KANJ.sh karena banyak tanda kutip bertumpuk
+3. **Terminal terjebak di mode input** — saat mencoba pakai `cat > file << EOF`, output binary PDF terbaca sebagai perintah sehingga terminal tidak bisa menerima input baru
+4. **ASCII art berantakan** — font ASCII art terlalu lebar untuk ukuran terminal sehingga tampilan menjadi tidak rapi
+5. **Embedded git repository** — folder `peta-gunung-kawi` hasil clone memiliki `.git` sendiri sehingga tidak bisa langsung di-push, harus dihapus `.git`-nya terlebih dahulu
 ## Struktur Repository
 ```
 SISOP-1-2026-IT-031
