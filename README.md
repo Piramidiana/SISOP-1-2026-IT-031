@@ -1,4 +1,4 @@
-kkk# SISOP-1-2026-IT-031
+# SISOP-1-2026-IT-031
 
 ## Identitas
 | No | Nama | NRP |
@@ -7,6 +7,81 @@ kkk# SISOP-1-2026-IT-031
 
 ## Soal 1 - ARGO NGAWI JESGEJES
 Soal 1 menggunakan AWK untuk menganalisis data penumpang kereta KANJ dari file passenger.csv. Script KANJ.sh dibuat untuk menjawab 5 sub-soal yaitu menghitung total penumpang, jumlah gerbong unik, penumpang tertua, rata-rata usia, dan jumlah penumpang Business Class.
+
+## Soal 1 - ARGO NGAWI JESGEJES
+Soal 1 menggunakan AWK untuk menganalisis data penumpang kereta KANJ dari file passenger.csv. Script KANJ.sh dibuat untuk menjawab 5 sub-soal yaitu menghitung total penumpang, jumlah gerbong unik, penumpang tertua, rata-rata usia, dan jumlah penumpang Business Class.
+
+### Penjelasan Program
+
+#### A. Struktur Dasar KANJ.sh
+Script menerima 2 parameter:
+- `$1` = nama file CSV
+- `$2` = mode (a/b/c/d/e)
+```bash
+FILE=$1
+SOAL=$2
+```
+
+#### B. Validasi Input
+```bash
+if [ -z "$FILE" ] || [ -z "$SOAL" ]; then
+    echo "Penggunaan: ./KANJ.sh passenger.csv a/b/c/d/e"
+    exit 1
+fi
+```
+**Penjelasan:**
+- `-z` digunakan untuk mengecek apakah variabel kosong
+- Jika FILE atau SOAL kosong, program akan berhenti dan menampilkan pesan error
+
+#### C. Mode A — Hitung Total Penumpang
+```bash
+count_passenger=$(awk -F',' 'NR>1 {count++} END {print count}' $FILE)
+echo "Jumlah seluruh penumpang KANJ adalah ${count_passenger} orang"
+```
+**Penjelasan:**
+- `-F','` menentukan pemisah kolom adalah koma
+- `NR>1` untuk melewati baris header
+- `count++` menghitung jumlah baris data
+
+#### D. Mode B — Hitung Jumlah Gerbong Unik
+```bash
+carriage=$(awk -F',' 'NR>1 {gerbong[$4]=1} END {print length(gerbong)}' $FILE)
+echo "Jumlah gerbong penumpang KANJ adalah ${carriage}"
+```
+**Penjelasan:**
+- `gerbong[$4]=1` menyimpan nama gerbong sebagai key array
+- Array otomatis menghilangkan duplikat
+- `length(gerbong)` menghitung jumlah elemen unik
+
+#### E. Mode C — Cari Penumpang Tertua
+```bash
+age=$(awk -F',' 'NR>1 {if($2+0>max+0) max=$2} END {print max}' $FILE)
+nama=$(awk -F',' -v m="$age" 'NR>1 && $2==m {print $1}' $FILE)
+echo "${nama} adalah penumpang kereta tertua dengan usia ${age} tahun"
+```
+**Penjelasan:**
+- AWK pertama mencari nilai usia tertinggi
+- AWK kedua mencari nama penumpang yang usianya sama dengan usia tertinggi
+- `$2+0` digunakan untuk memastikan perbandingan dilakukan secara numerik
+
+#### F. Mode D — Hitung Rata-rata Usia
+```bash
+average_age=$(awk -F',' 'NR>1 {total+=$2; count++} END {print int(total/count)}' $FILE)
+echo "Rata-rata usia penumpang adalah ${average_age} tahun"
+```
+**Penjelasan:**
+- `total+=$2` menjumlahkan semua usia
+- `count++` menghitung jumlah penumpang
+- `int()` membulatkan hasil pembagian ke bawah
+
+#### G. Mode E — Hitung Penumpang Business Class
+```bash
+business_passenger=$(awk -F',' 'NR>1 && $3=="Business" {count++} END {print count}' $FILE)
+echo "Jumlah penumpang business class ada ${business_passenger} orang"
+```
+**Penjelasan:**
+- `$3=="Business"` memfilter hanya baris dengan kelas Business
+- `count++` menghitung jumlah penumpang Business Class
 
 ### Cara Menjalankan
 ```
