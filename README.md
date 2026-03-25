@@ -110,6 +110,36 @@ cd soal_1
 ## Soal 2 - EKSPEDISI GUNUNG KAWI
 Soal 2 melibatkan download file PDF menggunakan gdown, membaca isi PDF dengan cat untuk menemukan link GitHub, clone repo, parsing koordinat dari gsxtrack.json menggunakan parserkoordinat.sh, dan menghitung titik tengah koordinat menggunakan nemupusaka.sh.
 
+### Penjelasan Program
+
+#### A. parserkoordinat.sh
+Script ini mengekstrak data dari file `gsxtrack.json` menjadi format CSV di file `titik-penting.txt`.
+```bash
+grep -E '"id"|"site_name"|"latitude"|"longitude"' $FILE | \
+grep -v "dataset" | \
+awk '...' > $OUTPUT
+```
+**Penjelasan:**
+- `grep -E` mencari baris yang mengandung keyword id, site_name, latitude, longitude
+- `grep -v "dataset"` mengabaikan baris dataset_info yang juga mengandung latitude/longitude
+- AWK memproses setiap baris dan mencetak hasil dalam format `id,site_name,latitude,longitude`
+
+#### B. nemupusaka.sh
+Script ini menghitung titik tengah diagonal dari 4 koordinat menggunakan rumus titik tengah.
+```bash
+lat1=$(awk -F',' 'NR==1 {print $3}' $INPUT)
+lon1=$(awk -F',' 'NR==1 {print $4}' $INPUT)
+lat2=$(awk -F',' 'NR==3 {print $3}' $INPUT)
+lon2=$(awk -F',' 'NR==3 {print $4}' $INPUT)
+
+pusat_lat=$(awk -v a="$lat1" -v b="$lat2" 'BEGIN {printf "%.6f", (a+b)/2}')
+pusat_lon=$(awk -v a="$lon1" -v b="$lon2" 'BEGIN {printf "%.6f", (a+b)/2}')
+```
+**Penjelasan:**
+- Mengambil koordinat node_001 (baris 1) dan node_003 (baris 3) yang berseberangan diagonal
+- Menghitung rata-rata latitude dan longitude menggunakan rumus titik tengah `(x1+x2)/2`
+- `printf "%.6f"` memformat hasil dengan 6 angka di belakang koma
+
 ### Cara Menjalankan
 ```
 cd soal_2/ekspedisi
