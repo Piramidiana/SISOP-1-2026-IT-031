@@ -162,6 +162,82 @@ cd peta-gunung-kawi
 
 ## Soal 3 - KOS SLEBEW AMBATUKAM
 Soal 3 membuat sistem manajemen kost berbasis CLI menggunakan Bash script dengan fitur tambah penghuni, hapus penghuni, tampilkan daftar penghuni, update status dan cetak laporan keuangan, serta kelola cron job untuk pengingat tagihan.
+### Penjelasan Program
+
+#### A. Inisialisasi File
+```bash
+DATA="$HOME/soal_3/data/penghuni.csv"
+LOG="$HOME/soal_3/log/tagihan.log"
+REKAP="$HOME/soal_3/rekap/laporan_bulanan.txt"
+SAMPAH="$HOME/soal_3/sampah/history_hapus.csv"
+```
+**Penjelasan:**
+- Mendefinisikan path file yang digunakan oleh semua fungsi
+- Menggunakan `$HOME` agar path selalu benar di semua user
+
+#### B. Fungsi Tambah Penghuni
+```bash
+tambah_penghuni() {
+    cek=$(awk -F',' -v k="$kamar" 'NR>1 && $2==k {print $2}' $DATA)
+    if [ ! -z "$cek" ]; then
+        echo "Kamar $kamar sudah terisi!"
+        return
+    fi
+    echo "$nama,$kamar,$harga,$tanggal,$status" >> $DATA
+}
+```
+**Penjelasan:**
+- Validasi kamar tidak boleh sama menggunakan AWK
+- `>>` menambahkan data baru ke file tanpa menghapus data lama
+- Validasi status hanya boleh Aktif atau Menunggak
+
+#### C. Fungsi Hapus Penghuni
+```bash
+hapus_penghuni() {
+    awk -F',' -v n="$nama" -v t="$tanggal_hapus" \
+    'NR>1 && $1==n {print $0","t}' $DATA >> $SAMPAH
+    sed -i "/^$nama,/d" $DATA
+}
+```
+**Penjelasan:**
+- Data yang dihapus dipindahkan ke `history_hapus.csv` dengan tambahan tanggal hapus
+- `sed -i` menghapus baris yang mengandung nama penghuni dari file utama
+
+#### D. Fungsi Tampilkan Penghuni
+```bash
+tampil_penghuni() {
+    awk -F',' 'NR>1 {
+        printf "%-3d| %-16s| %-6s| %-12s| %s\n", NR-1, $1, $2, $3, $5
+    }' $DATA
+}
+```
+**Penjelasan:**
+- `printf` dengan format `%-Nd` untuk mengatur lebar kolom agar tampilan rapi
+- `NR-1` untuk menampilkan nomor urut tanpa menghitung header
+
+#### E. Fungsi Update Status & Laporan Keuangan
+```bash
+update_laporan() {
+    sed -i "s/^$nama,\(.*\),\(.*\)$/$nama,\1,$status_baru/" $DATA
+    total_aktif=$(awk -F',' 'NR>1 && $5=="Aktif" {total+=$3} END {print total+0}' $DATA)
+}
+```
+**Penjelasan:**
+- `sed -i` dengan regex untuk mengganti status penghuni
+- AWK menghitung total pemasukan dari penghuni Aktif dan tunggakan dari penghuni Menunggak
+
+#### F. Fungsi Kelola Cron
+```bash
+kelola_cron() {
+    crontab -l 2>/dev/null | grep -v "kost_slebew" > /tmp/crontab_tmp
+    echo "$menit $jam * * * $SCRIPT --check-tagihan >> $LOG 2>&1" >> /tmp/crontab_tmp
+    crontab /tmp/crontab_tmp
+}
+```
+**Penjelasan:**
+- `crontab -l` menampilkan cron job yang aktif
+- `grep -v "kost_slebew"` menghapus cron job lama sebelum menambah yang baru
+- Format cron `menit jam * * *` artinya dijalankan setiap hari pada jam dan menit tertentu
 
 ### Cara Menjalankan
 ```
