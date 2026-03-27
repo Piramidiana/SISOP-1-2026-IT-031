@@ -5,8 +5,6 @@
 |----|------|-----|
 | 1  | Dian Piramidiana Rachmatika | 5027251031 |
 
-## Soal 1 - ARGO NGAWI JESGEJES
-Soal 1 menggunakan AWK untuk menganalisis data penumpang kereta KANJ dari file passenger.csv. Script KANJ.sh dibuat untuk menjawab 5 sub-soal yaitu menghitung total penumpang, jumlah gerbong unik, penumpang tertua, rata-rata usia, dan jumlah penumpang Business Class.
 
 ## Soal 1 - ARGO NGAWI JESGEJES
 Soal 1 menggunakan AWK untuk menganalisis data penumpang kereta KANJ dari file passenger.csv. Script KANJ.sh dibuat untuk menjawab 5 sub-soal yaitu menghitung total penumpang, jumlah gerbong unik, penumpang tertua, rata-rata usia, dan jumlah penumpang Business Class.
